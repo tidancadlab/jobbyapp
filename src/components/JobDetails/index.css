@@ -1,0 +1,55 @@
+.jobs {
+  display: flex;
+  flex-direction: column;
+}
+.wrap_card {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+}
+.wrap_card li {
+  max-width: 450px;
+}
+.skills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 64px;
+}
+.skills li {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 16px;
+  min-width: 200px;
+}
+.life_of_company {
+  display: flex;
+  flex-direction: column;
+}
+.job_error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.error_container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-grow: 1;
+  justify-content: center;
+}
+.url_conatiner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.website_url{
+  color: lightblue;
+  text-decoration: underline;
+}
+@media (min-width: 577px) {
+  .life_of_company {
+    flex-direction: row;
+  }
+}

@@ -1,0 +1,26 @@
+.home {
+  background-image: url('https://assets.ccbp.in/frontend/react-js/home-sm-bg.png');
+  background-position: center;
+  background-size: cover;
+  flex-grow: 1;
+  padding: 0;
+}
+.home_heading {
+  font-size: 44px;
+}
+.home_description {
+  font-size: 20px;
+}
+@media (min-width: 577px) {
+  .home {
+    background-image: url('https://assets.ccbp.in/frontend/react-js/home-lg-bg.png');
+  }
+  .home_heading {
+    font-size: 64px;
+    max-width: 650px;
+  }
+  .home_description {
+    font-size: 30px;
+    max-width: 650px;
+  }
+}
