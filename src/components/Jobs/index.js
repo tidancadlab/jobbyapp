@@ -20,6 +20,7 @@ export default class Jobs extends Component {
   state = {
     profile: {},
     jobList: [],
+    locationList: [],
     searchParams: '',
     profileStatus: status.initial,
     jobListStatus: status.initial,
@@ -56,7 +57,7 @@ export default class Jobs extends Component {
     this.setState({searchParams: e.target.value})
   }
 
-  onSerachClick = () => {
+  onSearchClick = () => {
     this.getJobsData()
   }
 
@@ -102,7 +103,7 @@ export default class Jobs extends Component {
       })
       if (response.ok) {
         const {jobs, total} = await response.json()
-        const camleCaseData = jobs.map(data => ({
+        const CamelCaseData = jobs.map(data => ({
           companyLogoUrl: data.company_logo_url,
           employmentType: data.employment_type,
           id: data.id,
@@ -113,7 +114,7 @@ export default class Jobs extends Component {
           title: data.title,
         }))
         if (total > 0) {
-          this.setState({jobList: camleCaseData, jobListStatus: status.success})
+          this.setState({jobList: CamelCaseData, jobListStatus: status.success})
         } else {
           this.setState({jobListStatus: status.reject})
         }
@@ -156,8 +157,23 @@ export default class Jobs extends Component {
     return userStatus
   }
 
+  onLocation = loc => {
+    const {locationList} = this.state
+    if (locationList.includes(loc)) {
+      const exceptLocationList = locationList.filter(v => v !== loc)
+      this.setState(() => ({locationList: exceptLocationList}))
+    } else {
+      locationList.push(loc)
+      this.setState(() => ({locationList}))
+    }
+  }
+
   jobsCard = () => {
-    const {jobList, jobListStatus} = this.state
+    const {jobList, jobListStatus, locationList} = this.state
+    const locationFilterJobs =
+      locationList.length > 0
+        ? jobList.filter(v => locationList.includes(v.location))
+        : jobList
     let userStatus
     switch (jobListStatus) {
       case status.initial:
@@ -170,11 +186,22 @@ export default class Jobs extends Component {
       case status.success:
         userStatus = (
           <>
-            <ul className="job_card_container">
-              {jobList.map(value => (
-                <JobCard key={value.id} data={value} />
-              ))}
-            </ul>
+            {locationFilterJobs.length > 0 ? (
+              <ul className="job_card_container">
+                {locationFilterJobs.map(value => (
+                  <JobCard key={value.id} data={value} />
+                ))}
+              </ul>
+            ) : (
+              <div className="job_error">
+                <img
+                  src="https://assets.ccbp.in/frontend/react-js/no-jobs-img.png"
+                  alt="no jobs"
+                />
+                <h1>No Jobs Found</h1>
+                <p>We cannot find any jobs. Try other filters.</p>
+              </div>
+            )}
           </>
         )
         break
@@ -219,6 +246,14 @@ export default class Jobs extends Component {
 
   render() {
     const {searchParams} = this.state
+    const {locationList} = this.state
+    const locationsList = [
+      'Hyderabad',
+      'Bangalore',
+      'Chennai',
+      'Delhi',
+      'Mumbai',
+    ]
     return (
       <div className="main">
         <div className="page_container jobs">
@@ -230,7 +265,7 @@ export default class Jobs extends Component {
                   value={searchParams}
                   onChange={this.onSearchChange}
                   type="search"
-                  placeholder="Serach"
+                  placeholder="Search"
                   id="search"
                 />
                 <button
@@ -238,7 +273,7 @@ export default class Jobs extends Component {
                   className="btn btn-search"
                   type="button"
                   data-testid="searchButton"
-                  onClick={this.onSerachClick}
+                  onClick={this.onSearchClick}
                 >
                   <BsSearch fill="white" />
                 </button>
@@ -247,7 +282,7 @@ export default class Jobs extends Component {
               <Store.Consumer>
                 {storeData => (
                   <div className="filter">
-                    <h3 className="border-t">Type of Employent</h3>
+                    <h3 className="border-t">Type of Employment</h3>
                     <ul className="filter_container">
                       {storeData.employmentTypesList.map(value => (
                         <li key={value.employmentTypeId}>
@@ -265,22 +300,41 @@ export default class Jobs extends Component {
                     <h3 className="border-t">Salary Range</h3>
                     <ul className="filter_container">
                       {storeData.salaryRangesList.map(value => (
-                        <li key={value.salaryRangeId}>
-                          <input
-                            type="radio"
-                            id={value.salaryRangeId}
-                            onChange={e => {
-                              this.setState(
-                                {salaryRange: e.target.id},
-                                this.getJobsData,
-                              )
-                            }}
-                            name="salaryRange"
-                          />
-                          <label htmlFor={value.salaryRangeId}>
-                            {value.label}
-                          </label>
-                        </li>
+                        <>
+                          <li key={value.salaryRangeId}>
+                            <input
+                              type="radio"
+                              id={value.salaryRangeId}
+                              onChange={e => {
+                                this.setState(
+                                  {salaryRange: e.target.id},
+                                  this.getJobsData,
+                                )
+                              }}
+                              name="salaryRange"
+                            />
+                            <label htmlFor={value.salaryRangeId}>
+                              {value.label}
+                            </label>
+                          </li>
+                        </>
+                      ))}
+                    </ul>
+                    <h3 className="border-t">Locations</h3>
+                    <ul className="filter_container">
+                      {locationsList.map(value => (
+                        <>
+                          <li key={value}>
+                            <input
+                              type="checkbox"
+                              checked={locationList.includes(value)}
+                              id={value}
+                              onChange={() => this.onLocation(value)}
+                              name="salaryRange"
+                            />
+                            <label htmlFor={value}>{value}</label>
+                          </li>
+                        </>
                       ))}
                     </ul>
                   </div>
@@ -293,7 +347,7 @@ export default class Jobs extends Component {
                   value={searchParams}
                   onChange={this.onSearchChange}
                   type="search"
-                  placeholder="Serach"
+                  placeholder="Search"
                   id="search"
                 />
                 <button
@@ -301,7 +355,7 @@ export default class Jobs extends Component {
                   className="btn btn-search"
                   type="button"
                   data-testid="searchButton"
-                  onClick={this.onSerachClick}
+                  onClick={this.onSearchClick}
                 >
                   <BsSearch fill="white" />
                 </button>
